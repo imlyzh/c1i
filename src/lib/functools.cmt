@@ -45,6 +45,7 @@
         [(null? lst) nil]
         [else (error lst)]))
 
+
 ; List[(Sym . V)] -> Sym -> Option[V]
 (defun (find record-list key)
     (cond
@@ -52,9 +53,17 @@
         [(eq? (car (car record-list)) key) (cdr (car record-list))]
         [else (find (cdr record-list) key)]))
 
+; List[(Sym . V)] -> Sym -> V
+(defun (strict-find record-list key)
+    (cond
+        [(null? record-list) (error "Key not found")]
+        [(eq? (car (car record-list)) key) (cdr (car record-list))]
+        [else (strict-find (cdr record-list) key)]))
+
 ; (defun (list? lst)
 ;     (cond
 ;         [(pair? lst) f]))
+
 
 (defun (and-list-lazy args)
     (cond

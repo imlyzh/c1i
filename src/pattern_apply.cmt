@@ -1,0 +1,27 @@
+
+
+;;; (apply-pattern '(macro '(unquote args) '(unquote body)) '((args a) (body . a)))
+
+(defun (apply-pattern pattern pairs)
+    (cond
+        [(is-unquote? pattern) (strict-find pairs (car (cdr pattern)))]
+        [(pair? pattern) (apply-pair pattern pairs)]
+        [else pattern]))
+
+(defun (apply-pair pattern pairs)
+    (cond
+        [(pair? pattern)
+            (let (
+                [tcar (car pattern)]
+                [tcdr (cdr pattern)])
+                (cons (apply-pattern tcar pairs)
+                    (apply-pattern tcdr pairs)))]
+        [else (matching pattern src)]))
+
+(defun (is-unquote? pattern)
+    (cond
+        [(pair? pattern)
+            (cond
+                [(and (eq? (car pattern) 'unquote) (pair? (cdr pattern))) (sym? (car (cdr pattern)))]
+                [else f])]
+        [else f]))

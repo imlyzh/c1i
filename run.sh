@@ -1,1 +1,1 @@
-c0i ./src/lib/functools ./src/main
+c0i ./src/lib/functools.cmt ./src/pattern.cmt

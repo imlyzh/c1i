@@ -1,4 +1,12 @@
 
+
+
+;;; matching example
+;;; >>> (define temp (read "('macro args body)"))
+;;; >>> (define src (read "(macro (a) a)"))
+;;; >>> (matching temp src)
+;;; '('(args a) '(body . a))
+;;;
 (defun (matching pattern src)
     (cond
         [(sym? pattern) (cons (cons pattern src) nil)]

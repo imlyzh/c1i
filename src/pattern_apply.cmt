@@ -2,26 +2,27 @@
 
 ;;; (apply-pattern (read "(macro ,args ,body*)") result)
 
-(define (apply-pattern pattern pairs)
-	(cond
-		[(is-unquote? pattern) (strict-find pairs (car (cdr pattern)))]
-		[(pair? pattern) (apply-pair pattern pairs)]
-		[else pattern]))
+(define (apply-template template pairs)
+  (cond
+    [(is-unquote? template) (strict-lookup pairs (car (cdr template)))]
+    [(pair? template) (apply-pair template pairs)]
+    [else template]))
 
-(define (apply-pair pattern pairs)
-	(cond
-		[(pair? pattern)
-			(let (
-				[tcar (car pattern)]
-				[tcdr (cdr pattern)])
-				(cons (apply-pattern tcar pairs)
-					(apply-pattern tcdr pairs)))]
-		[else (matching pattern src)]))
+(define (apply-pair template pairs)
+  (cond
+    [(pair? template)
+      (let ([tcar (car template)]
+            [tcdr (cdr template)])
+        (cons (apply-template tcar pairs) (apply-template tcdr pairs)))]
+    [else (apply-template template pairs)]))
 
+
+;; is not supported nonsym in pattern matching
 (define (is-unquote? pattern)
-	(cond
-		[(pair? pattern)
-			(cond
-				[(and (eq? (car pattern) 'unquote) (pair? (cdr pattern))) (sym? (car (cdr pattern)))]
-				[else f])]
-		[else f]))
+  (cond
+    [(pair? pattern)
+      (cond
+        [(and (eq? (car pattern) 'unquote) (pair? (cdr pattern)))
+          (sym? (car (cdr pattern)))]
+        [else f])]
+    [else f]))

@@ -42,7 +42,6 @@
 (define (get-quote pat) (car (cdr pat)))
 
 
-
 (define (matching-test)
   (define pat (read "(macro 'name 'args 'body)"))
   (define src (read "(macro foo (a) (puts a))"))

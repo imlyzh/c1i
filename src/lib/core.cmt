@@ -59,18 +59,18 @@
 
 
 ; List[(Sym . V)] -> Sym -> Option[V]
-(define (find record-list key)
+(define (lookup record-list key)
   (cond
     [(null? record-list) nil]
     [(eq? (car (car record-list)) key) (cdr (car record-list))]
-    [else (find (cdr record-list) key)]))
+    [else (lookup (cdr record-list) key)]))
 
 ; List[(Sym . V)] -> Sym -> V
-(define (strict-find record-list key)
+(define (strict-lookup record-list key)
   (cond
     [(null? record-list) (error "Key not found")]
     [(eq? (car (car record-list)) key) (cdr (car record-list))]
-    [else (strict-find (cdr record-list) key)]))
+    [else (strict-lookup (cdr record-list) key)]))
 
 ; (define (list? lst)
 ;     (cond

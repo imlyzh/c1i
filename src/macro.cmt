@@ -6,17 +6,22 @@
 
 
 (define (macro-process macro)
-    (define r (matching macro-rule macro))
-    (cons (strict-find r 'name) r))
+  (define r (matching macro-rule macro))
+  (cons (strict-find r 'name) r))
 
 
 (define (macro-apply macro-pattern src)
-    (define args (strict-find macro-pattern 'args))
-    (define body (strict-find macro-pattern 'body))
-    (apply-pattern body (matching args src)))
+  (define args (strict-find macro-pattern 'args))
+  (define body (strict-find macro-pattern 'body))
+  (apply-pattern body (matching args src)))
 
 ; (define macro-rule (read "(macro 'name 'args 'body)"))
 
 (define (define-proc-macro macro)
-    (define r (matching macro-rule macro))
-    (cons (strict-find r 'name) r))
+  (define r (matching macro-rule macro))
+  (cons (strict-find r 'name) r))
+
+
+(define (rewrite-rule pat temp src)
+  (define r (matching pat src))
+  (result-map r (lambda (x) (apply-template temp x))))

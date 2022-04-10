@@ -3,15 +3,7 @@
 (define f false)
 (define n nil)
 
-(define (->string v)
-  (cond
-    [(str? v) v]
-    [else (literal v)]))
 
-(define (string v)
-  (cond
-    [(str? v) v]
-    [else (literal v)]))
 
 (define (list . args)
   args)

@@ -8,18 +8,23 @@
 ;;;
 
 
-(define (matching pattern src)
+(define (matching pat src)
+  (define r (raw-matching pat src))
+  (filter (lambda (r) (ne? r nil)) r))
+
+
+(define (raw-matching pat src)
   (cond
-    [(is-quote pattern) (cons (get-quote pattern) src)]
-    [(is-pairs pattern src) (matching-pair pattern src)]
-    [(eq? pattern src) nil]
+    [(is-quote pat) (cons (get-quote pat) src)]
+    [(is-pairs pat src) (matching-pair pat src)]
+    [(eq? pat src) nil]
     [else 'err]))
 
 
-(define (matching-pair pattern src)
+(define (matching-pair pat src)
   (cond
-    [(is-pairs pattern src) (result-map (matching (car pattern) (car src))
-                                        (lambda (r) (result-map (matching (cdr pattern) (cdr src))
+    [(is-pairs pat src) (result-map (raw-matching (car pat) (car src))
+                                        (lambda (r) (result-map (raw-matching (cdr pat) (cdr src))
                                                                 (lambda (r1) (cons r r1)))))]
     [else 'err]))
 
@@ -28,19 +33,17 @@
   (and (pair? pat) (pair? src)))
 
 
-(define (is-quote pattern)
+(define (is-quote pat)
   (cond
-    [(pair? pattern) (eq? (car pattern) 'quote)]
+    [(pair? pat) (eq? (car pat) 'quote)]
     [else false]))
 
 
-(define (get-quote pattern) (car (cdr pattern)))
+(define (get-quote pat) (car (cdr pat)))
 
 
 
 (define (matching-test)
-  (define temp (read "(macro 'name 'args 'body)"))
+  (define pat (read "(macro 'name 'args 'body)"))
   (define src (read "(macro foo (a) (puts a))"))
-  (define r (matching temp src))
-  (filter (lambda (r) (ne? r nil)) r))
-
+  (matching pat src))

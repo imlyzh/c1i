@@ -1,0 +1,148 @@
+
+(define t true)
+(define f false)
+(define n nil)
+
+(define (->string v)
+  (cond
+    [(str? v) v]
+    [else (literal v)]))
+
+(define (string v)
+  (cond
+    [(str? v) v]
+    [else (literal v)]))
+
+(define (list . args)
+  args)
+
+(define (opt-map f i)
+  (cond
+    [(eq? i 'err) i]
+    [else (f i)]))
+
+
+(define result-map
+  (lambda (res isok)
+    (cond
+      [(eq? res 'err) 'err]
+      [else (isok res)])))
+
+
+(define (map fun lst)
+  (cond
+    [(pair? lst) (let (
+      [h (fun (car lst))]
+      [t (map fun (cdr lst))])
+      (cons h t))]
+    [(null? lst) nil]
+    [else (fun lst)]))
+
+(define (filter cnd lst)
+  (cond
+    [(null? lst) nil]
+    [(cnd (car lst)) (cons (car lst) (filter cnd (cdr lst)))]
+    [else (filter cnd (cdr lst))]))
+
+(define (fold fun init lst)
+  (define h (car lst))
+  (define d (cdr lst))
+  (cond
+    [(null? d) (fun init h)]
+    [(pair? d) (fold fun (fun init h) d)]
+    [else (error)]))
+
+
+(define (append lst1 lst2)
+  (cond
+    [(null? lst1) lst2]
+    [(null? lst2) lst1]
+    [else (cons (car lst1) (append (cdr lst1) lst2))]))
+
+(define (reduce fun lst)
+  (cond
+    [(null? lst) nil]
+    [(pair? lst) (fold fun (car lst) (cdr lst))]
+    [else (error lst)]))
+
+
+; List[(Sym . V)] -> Sym -> Option[V]
+(define (find record-list key)
+  (cond
+    [(null? record-list) nil]
+    [(eq? (car (car record-list)) key) (cdr (car record-list))]
+    [else (find (cdr record-list) key)]))
+
+; List[(Sym . V)] -> Sym -> V
+(define (strict-find record-list key)
+  (cond
+    [(null? record-list) (error "Key not found")]
+    [(eq? (car (car record-list)) key) (cdr (car record-list))]
+    [else (strict-find (cdr record-list) key)]))
+
+; (define (list? lst)
+;     (cond
+;         [(pair? lst) f]))
+
+
+(define (and-list-lazy args)
+    (cond
+      [(null? args) t]
+      [(pair? args)
+        (cond
+          [(car args) (and-list-lazy (cdr args))]
+          [else f])]
+      [else (error "or-list-lazy: args is not a list")]))
+
+(define (or-list-lazy args)
+  (cond
+    [(null? args) f]
+    [(pair? args)
+      (cond
+        [(car args) t]
+        [else (or-list-lazy (cdr args))])]
+    [else (error "or-list-lazy: args is not a list")]))
+
+(define (and . args)
+  (and-list-lazy args))
+
+(define (or . args)
+  (or-list-lazy args))
+
+; (define (and . args)
+;     (fold raw-and false args))
+;
+; (define (or . args)
+;     (fold raw-or false args))
+
+
+(define (num-mux a i u f)
+  (cond
+    [(int? a) i]
+    [(uint? a) u]
+    [(float? a) f]))
+
+
+(define (+ . args)
+  (define fun (num-mux (car args) +i +u +f))
+  (define num (num-mux (car args) +0 0 0.0))
+  (fold fun num args))
+
+
+(define (- a0 . args)
+  (define fun (num-mux (car args) -i -u -f))
+  (define num (num-mux (car args) +0 0 0.0))
+  (cond
+    [(null? args) (fun num a0)]
+    [else (fold fun a0 args)]))
+
+
+(define (* . args)
+  (define fun (num-mux (car args) *i *u *f))
+  (define num (num-mux (car args) +1 1 1.0))
+  (fold fun num args))
+
+
+(define (/ . args)
+  (define fun (num-mux (car args) /i /u /f))
+  (reduce fun args))

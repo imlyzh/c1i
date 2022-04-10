@@ -1,16 +1,22 @@
 
 
-(define macro-rule (read "(macro 'name 'args 'body)"))
+(define macro-rule (read "('macro name args body)"))
 
 (define macro-pattern-record nil)
 
 
-(defun (macro-process macro)
+(define (macro-process macro)
     (define r (matching macro-rule macro))
     (cons (strict-find r 'name) r))
 
 
-(defun (macro-apply macro-pattern src)
+(define (macro-apply macro-pattern src)
     (define args (strict-find macro-pattern 'args))
-    (define body (strict-find macro-pattern 'body)
+    (define body (strict-find macro-pattern 'body))
     (apply-pattern body (matching args src)))
+
+; (define macro-rule (read "(macro 'name 'args 'body)"))
+
+(define (define-proc-macro macro)
+    (define r (matching macro-rule macro))
+    (cons (strict-find r 'name) r))

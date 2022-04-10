@@ -1,39 +1,46 @@
 
-
-
 ;;; matching example
-;;; >>> (define temp (read "(macro 'args 'body)"))
+;;; >>> (define temp (read "('macro args body)"))
 ;;; >>> (define src (read "(macro (a) a)"))
-;;; >>> (matching temp src)
-;;; '('(args a) '(body . a))
+;;; >>> (define result (matching temp src))
+;;; >>> result
+;;;
 ;;;
 
-(defun (matching pattern src)
-    (cond
-        ; [(sym? pattern) (cons (cons pattern src) nil)]
-        [(is-quote? pattern) (cons (cons (car (cdr pattern)) src) nil)]
-        [(and (pair? pattern) (pair? src)) (matching-pair pattern src)]
-        [(eq? pattern src) nil]
-        [else (error "pattern matching error")]))
+
+(define (matching pattern src)
+  (cond
+    [(is-quote pattern) (cons (get-quote pattern) src)]
+    [(is-pairs pattern src) (matching-pair pattern src)]
+    [(eq? pattern src) nil]
+    [else 'err]))
 
 
-(defun (matching-pair pattern src)
-    (cond
-        [(and (pair? pattern) (pair? src))
-            (let (
-                [pcar (car pattern)]
-                [pcdr (cdr pattern)]
-                [scar (car src)]
-                [scdr (cdr src)])
-                (append (matching pcar scar) (matching-pair pcdr scdr)))]
-        [else (matching pattern src)]))
+(define (matching-pair pattern src)
+  (cond
+    [(is-pairs pattern src) (result-map (matching (car pattern) (car src))
+                                        (lambda (r) (result-map (matching (cdr pattern) (cdr src))
+                                                                (lambda (r1) (cons r r1)))))]
+    [else 'err]))
 
 
-(defun (is-quote? pattern)
-    (cond
-        [(pair? pattern)
-            (cond
-                [(and (eq? (car pattern) 'quote) (pair? (cdr pattern))) (sym? (car (cdr pattern)))]
-                [else f])]
-        [else f]))
+(define (is-pairs pat src)
+  (and (pair? pat) (pair? src)))
+
+
+(define (is-quote pattern)
+  (cond
+    [(pair? pattern) (eq? (car pattern) 'quote)]
+    [else false]))
+
+
+(define (get-quote pattern) (car (cdr pattern)))
+
+
+
+(define (matching-test)
+  (define temp (read "(macro 'name 'args 'body)"))
+  (define src (read "(macro foo (a) (puts a))"))
+  (define r (matching temp src))
+  (filter (lambda (r) (ne? r nil)) r))
 

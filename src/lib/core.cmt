@@ -88,7 +88,7 @@
     [(and (pair? lst) (null? (cdr lst))) (car lst)]
     [else (last (cdr lst))]))
 
-
+; if implmented set-cdr! fixme
 (define (delete-last lst)
   (cond
     [(and (pair? lst) (null? (cdr lst))) nil]

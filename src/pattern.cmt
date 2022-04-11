@@ -21,17 +21,6 @@
     [else 'err]))
 
 
-"
-(define (matching-pair pat src)
-  (cond
-    [(is-pairs pat src)
-     (result-map (lambda (r)
-                   (result-map (lambda (r1) (cons r r1))
-                               (raw-matching (cdr pat) (cdr src))))
-                 (raw-matching (car pat) (car src)))]
-    [else 'err]))
-"
-
 (define (matching-pair pat src)
   (cond
     [(is-pairs pat src)

@@ -1,10 +1,19 @@
 
 
+(define (rewrite-produre pat produre src)
+  (define r (matching pat src))
+  (result-map produre r))
+
+(define (rewrite-rule pat temp src)
+  (define (produre record) (apply-template temp record))
+  (rewrite-produre pat produre src))
+
+
 (define (if-rule src)
   (rewrite-rule '(if 'cond 'then 'else) '(cond [,cond ,then] [else ,else]) src))
 
 
-; fixme
+; if implmented set-cdr! fixme
 (define (begin-produre record)
   (define bodys (strict-lookup record 'bodys))
   (define last (last bodys))
@@ -15,3 +24,8 @@
 
 (define (begin-rule src)
   (rewrite-produre '(begin . 'bodys) begin-produre src))
+
+(define define-syntax-rule-temp '(define-syntax-rule 'pat 'body))
+
+(define define-syntax-temp '(define-syntax 'name 'fun))
+

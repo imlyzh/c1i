@@ -1,1 +1,1 @@
-c0i ./src/lib/functools.cmt ./src/pattern.cmt ./src/pattern_apply.cmt
+c0i ./src/lib/core.cmt ./src/pattern.cmt ./src/pattern_apply.cmt ./src/rewrite.cmt

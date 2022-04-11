@@ -4,21 +4,45 @@
 (define n nil)
 
 
+(define (ok exp)
+  (cons 'ok exp))
+
+(define (err exp)
+  (cons 'err exp))
+
+(define (box-result exp)
+  (cond
+    [(eq? exp 'err) (cons 'err nil)]
+    [else (cons 'ok exp)]))
+
+
+(define (box-result-map f x)
+  (cond
+    [(eq (car x) 'ok)
+      (ok (f (cdr x)))]
+    [(eq (car x) 'err)
+      (err (cdr x))]))
+
 
 (define (list . args)
   args)
 
 (define (opt-map f i)
   (cond
-    [(eq? i 'err) i]
+    [(null? i) i]
     [else (f i)]))
 
 
-(define result-map
-  (lambda (res isok)
-    (cond
-      [(eq? res 'err) 'err]
-      [else (isok res)])))
+(define (result-map isok res)
+  (cond
+    [(eq? res 'err) 'err]
+    [else (isok res)]))
+
+(define (product-result-map f1 f2)
+  (result-map (lambda (r)
+                (result-map (lambda (r1) (cons r r1))
+                            (f2)))
+              (f1)))
 
 
 (define (map fun lst)
@@ -51,11 +75,24 @@
     [(null? lst2) lst1]
     [else (cons (car lst1) (append (cdr lst1) lst2))]))
 
+
 (define (reduce fun lst)
   (cond
     [(null? lst) nil]
     [(pair? lst) (fold fun (car lst) (cdr lst))]
     [else (error lst)]))
+
+
+(define (last lst)
+  (cond
+    [(and (pair? lst) (null? (cdr lst))) (car lst)]
+    [else (last (cdr lst))]))
+
+
+(define (delete-last lst)
+  (cond
+    [(and (pair? lst) (null? (cdr lst))) nil]
+    [else (cons (car lst) (delete-last (cdr lst)))]))
 
 
 ; List[(Sym . V)] -> Sym -> Option[V]

@@ -1,0 +1,17 @@
+
+
+(define (if-rule src)
+  (rewrite-rule '(if 'cond 'then 'else) '(cond [,cond ,then] [else ,else]) src))
+
+
+; fixme
+(define (begin-produre record)
+  (define bodys (strict-lookup record 'bodys))
+  (define last (last bodys))
+  (define bodys (delete-last bodys))
+  (define r (map (lambda (x) (list 'define '_ x)) bodys))
+  (append r (list last)))
+
+
+(define (begin-rule src)
+  (rewrite-produre '(begin . 'bodys) begin-produre src))

@@ -10,23 +10,39 @@
 
 (define (matching pat src)
   (define r (raw-matching pat src))
-  (filter (lambda (r) (ne? r nil)) r))
+  (result-map (lambda (r) (filter (lambda (r) (ne? r nil)) r)) r))
 
 
 (define (raw-matching pat src)
   (cond
-    [(is-quote pat) (cons (get-quote pat) src)]
+    [(is-quote pat) (list (cons (get-quote pat) src))]
     [(is-pairs pat src) (matching-pair pat src)]
     [(eq? pat src) nil]
     [else 'err]))
 
 
+"
 (define (matching-pair pat src)
   (cond
-    [(is-pairs pat src) (result-map (raw-matching (car pat) (car src))
-                                        (lambda (r) (result-map (raw-matching (cdr pat) (cdr src))
-                                                                (lambda (r1) (cons r r1)))))]
+    [(is-pairs pat src)
+     (result-map (lambda (r)
+                   (result-map (lambda (r1) (cons r r1))
+                               (raw-matching (cdr pat) (cdr src))))
+                 (raw-matching (car pat) (car src)))]
     [else 'err]))
+"
+
+(define (matching-pair pat src)
+  (cond
+    [(is-pairs pat src)
+      (product-result-map
+        (lambda () (raw-matching (car pat) (car src)))
+        (lambda () (raw-matching (cdr pat) (cdr src))))]
+    [else 'err]))
+
+
+(define (is-list-end pat src)
+  (and (null? (cdr pat)) (null? (cdr src))))
 
 
 (define (is-pairs pat src)

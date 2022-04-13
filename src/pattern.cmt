@@ -15,7 +15,7 @@
 
 (define (raw-matching pat src)
   (cond
-    [(is-quote pat) (list (cons (get-quote pat) src))]
+    [(is-quote pat) (cons (get-quote pat) src)]
     [(is-pairs pat src) (matching-pair pat src)]
     [(eq? pat src) nil]
     [else 'err]))
@@ -44,10 +44,20 @@
     [else false]))
 
 
-(define (get-quote pat) (car (cdr pat)))
+(define (get-quote pat) (cadr pat))
 
 
 (define (matching-test)
   (define pat (read "(macro 'name 'args 'body)"))
   (define src (read "(macro foo (a) (puts a))"))
   (matching pat src))
+
+
+;; (list (pattern . callable)) -> [Result Value]
+(define (match-map records src)
+  (define mat-result (matching (caar records) src))
+  (cond
+    [(ne? mat-result 'err) ((cdar records) mat-result)]
+    [(null? records) (err nil)]
+    [else (match-map (cdr records) src)]))
+

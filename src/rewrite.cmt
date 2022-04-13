@@ -9,8 +9,15 @@
   (rewrite-produre pat produre src))
 
 
+(define if-rule-temp '(if 'cond 'then 'else))
+
+
+(define (if-apply records)
+  (apply-template '(cond [,cond ,then] [else ,else]) records))
+
+
 (define (if-rule src)
-  (rewrite-rule '(if 'cond 'then 'else) '(cond [,cond ,then] [else ,else]) src))
+  (rewrite-rule if-rule-temp '(cond [,cond ,then] [else ,else]) src))
 
 
 ; if implmented set-cdr! fixme
@@ -29,3 +36,6 @@
 
 (define define-syntax-temp '(define-syntax 'name 'fun))
 
+(define (dbg x)
+  (define _ (displayln x))
+  x)

@@ -4,7 +4,7 @@
 
 (define (apply-template template pairs)
   (cond
-    [(is-unquote? template) (strict-lookup pairs (car (cdr template)))]
+    [(is-unquote? template) (strict-lookup pairs (cadr template))]
     [(pair? template) (apply-pair template pairs)]
     [else template]))
 
@@ -23,6 +23,6 @@
     [(pair? pattern)
       (cond
         [(and (eq? (car pattern) 'unquote) (pair? (cdr pattern)))
-          (sym? (car (cdr pattern)))]
+          (sym? (cadr pattern))]
         [else f])]
     [else f]))

@@ -7,8 +7,15 @@
 (define (ok exp)
   (cons 'ok exp))
 
+(define (ok? exp)
+  (eq? (car exp) 'ok))
+
 (define (err exp)
   (cons 'err exp))
+
+(define (err? exp)
+  (eq? (car exp) 'err))
+
 
 (define (box-result exp)
   (cond
@@ -53,6 +60,20 @@
       (cons h t))]
     [(null? lst) nil]
     [else (fun lst)]))
+
+(define (exist fun lst)
+  (cond
+    [(pair? lst)
+      (cond
+        [(fun (car lst)) true]
+        [else (exist fun (cdr lst))])]
+    [(null? lst) false]
+    [else (error "find: not a list")]))
+
+
+(define (member mem lst)
+  (exist (lambda (x) (eq? x mem)) lst))
+
 
 (define (filter cnd lst)
   (cond
@@ -99,14 +120,14 @@
 (define (lookup record-list key)
   (cond
     [(null? record-list) nil]
-    [(eq? (car (car record-list)) key) (cdr (car record-list))]
+    [(eq? (caar record-list) key) (cdar record-list)]
     [else (lookup (cdr record-list) key)]))
 
 ; List[(Sym . V)] -> Sym -> V
 (define (strict-lookup record-list key)
   (cond
     [(null? record-list) (error "Key not found")]
-    [(eq? (car (car record-list)) key) (cdr (car record-list))]
+    [(eq? (caar record-list) key) (cdar record-list)]
     [else (strict-lookup (cdr record-list) key)]))
 
 ; (define (list? lst)
@@ -175,3 +196,36 @@
 (define (/ . args)
   (define fun (num-mux (car args) /i /u /f))
   (reduce fun args))
+
+
+(define (caar lst)
+  (car (car lst)))
+
+(define (caaar lst)
+  (car (car (car lst))))
+
+(define (caaaar lst)
+  (car (car (car (car lst)))))
+
+(define (cddr lst)
+  (cdr (cdr lst)))
+
+(define (cdddr lst)
+  (cdr (cdr (cdr lst))))
+
+(define (cddddr lst)
+  (cdr (cdr (cdr (cdr lst)))))
+
+(define (cadr lst)
+  (car (cdr lst)))
+
+(define (cdar lst)
+  (cdr (car lst)))
+
+"
+(define (assoc key lst)
+  (cond
+    [(null? lst) nil]
+    [(eq? key (caar lst)) (car lst)]
+    [else (assoc key (cdr lst))]))
+"

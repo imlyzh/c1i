@@ -1,0 +1,7 @@
+
+
+
+(define (for-range start end body)
+  (cond
+    [(< start end) ((lambda () (body start) (for-range (+ start 1) end body)))]
+    [else '()]))
